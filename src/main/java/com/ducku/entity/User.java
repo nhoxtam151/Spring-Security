@@ -1,6 +1,7 @@
 package com.ducku.entity;
 
 import java.lang.annotation.Target;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +26,7 @@ public class User {
   private String username;
   private String password;
   private String roles;
+  private LocalDateTime iat = LocalDateTime.now();
 
 
 }

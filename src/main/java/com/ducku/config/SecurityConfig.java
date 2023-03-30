@@ -6,7 +6,9 @@ import com.ducku.repository.MyUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,7 +44,7 @@ public class SecurityConfig {
     http.headers().frameOptions().disable();  //disabled this to connect h2 db
     http
         .authorizeHttpRequests()
-        .antMatchers("/api/v1/home/welcome", "/api/v1/home/user/add", "/h2-console/**")
+        .antMatchers("/api/v1/home/welcome", "/api/v1/home/user/add", "/h2-console/**", "/api/v1/home/auth/jwt")
         .permitAll();
     http
         .authorizeHttpRequests()
@@ -52,6 +54,18 @@ public class SecurityConfig {
     return http.build();
   }
 
+//  @Bean this for testing with in memory user
+//  public UserDetailsService userDetailsService() {
+//    UserDetails admin = User.withUsername("hehe")
+//        .password("hihi")
+//        .roles("ADMIN").build();
+//
+//    UserDetails employee = User.withUsername("cuccu")
+//        .password("hihi")
+//        .roles("EMPLOYEE").build();
+//
+//    return new InMemoryUserDetailsManager(admin);
+//  }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -65,5 +79,11 @@ public class SecurityConfig {
     authenticationProvider.setPasswordEncoder(passwordEncoder());
     authenticationProvider.setUserDetailsService(myUserDetailService);
     return authenticationProvider;
+  }
+
+  @Bean //create authenticationManager to support our to authenticate user
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
+    return configuration.getAuthenticationManager();
   }
 }
