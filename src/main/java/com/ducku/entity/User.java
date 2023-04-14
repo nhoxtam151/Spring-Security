@@ -1,11 +1,9 @@
 package com.ducku.entity;
 
-import java.lang.annotation.Target;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -14,9 +12,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "app_user")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class User {
 
   @Id
@@ -29,4 +27,9 @@ public class User {
   private LocalDateTime iat = LocalDateTime.now();
 
 
+  public User(String username, String password, String roles) {
+    this.username = username;
+    this.password = password;
+    this.roles = roles;
+  }
 }

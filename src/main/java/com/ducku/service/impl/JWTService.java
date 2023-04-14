@@ -1,6 +1,7 @@
 package com.ducku.service.impl;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -49,16 +50,17 @@ public class JWTService {
     return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
   }
 
+  //use the unique one, usernmae or email, etc
   public String generateToken(String username) {
-    Map<String, Object> claims = new HashMap<>();
-    return createToken(claims, username);
+
+    return createToken(username);
   }
 
-  private String createToken(Map<String, Object> claims, String username) {
-
+  private String createToken(String username) {
+    Claims claims = Jwts.claims().setSubject(username);
+    claims.put("some data", "data");
     return Jwts.builder()
         .setClaims(claims)
-        .setSubject(username)
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) //set it for 30mins
         .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();

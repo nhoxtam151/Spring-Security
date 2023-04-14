@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,15 +20,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 //remember to enable this method for authorize in controller
 @EnableMethodSecurity
-@Configuration
+@Configuration("securityConfig")
 @AllArgsConstructor
 public class SecurityConfig {
 
   private final MyUserDetailService myUserDetailService;
+  private final JWTAuthFilter jwtAuthFilter;
 
   //example of user
   //{
@@ -42,6 +45,12 @@ public class SecurityConfig {
     http.httpBasic();
     http.csrf().disable();
     http.headers().frameOptions().disable();  //disabled this to connect h2 db
+    http.exceptionHandling();
+
+    http.sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
     http
         .authorizeHttpRequests()
         .antMatchers("/api/v1/home/welcome", "/api/v1/home/user/add", "/h2-console/**", "/api/v1/home/auth/jwt")
@@ -54,10 +63,10 @@ public class SecurityConfig {
     return http.build();
   }
 
-//  @Bean this for testing with in memory user
+//  @Bean //this for testing with in memory user
 //  public UserDetailsService userDetailsService() {
 //    UserDetails admin = User.withUsername("hehe")
-//        .password("hihi")
+//        .password(passwordEncoder().encode("hihi"))
 //        .roles("ADMIN").build();
 //
 //    UserDetails employee = User.withUsername("cuccu")
